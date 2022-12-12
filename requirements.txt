@@ -1,0 +1,6 @@
+WTForms~=3.0.1
+Flask==2.2.2
+mysql-connector-python~=8.0.28
+PyYAML~=6.0
+Flask-wtf
+bootstrap-flask

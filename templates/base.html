@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% block styles %}
+    {{ bootstrap.load_css() }}
+    <link rel="stylesheet" href="{{url_for('.static', filename='style.css')}}">
+    {% endblock %}
+
+    <title>{{ config.NAME }} - {{title}}</title>
+    {% endblock %}
+</head>
+
+<body class="">
+{% block navbar %}
+<div class="navbar navbar-dark bg-dark navbar-expand-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('index') }}">{{ config.NAME }}</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav">
+                {% if session.loggedin %}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('users') }}">Работники</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('services') }}">Услуги</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('clients') }}">Клиенты</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('orders') }}">Заказы</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('schedule') }}">Расписание</a></li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                {% if session.loggedin %}
+                <li class="nav-item navbar-text">{{ session.username }}</li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Выйти</a></li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Авторизация</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<br>
+{% block content %}
+<div class="container-fluid">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% block app_content %}{% endblock %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+{{ bootstrap.load_js() }}
+<script type="module" src="../script.js"></script>
+{% endblock %}
+</body>
+</html>

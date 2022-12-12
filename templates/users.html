@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% import 'bootstrap5/form.html' as wtf %}
+
+{% block app_content %}
+<div class="row">
+    {% if session.role == 2 %}
+    <div class="col col-sm-2">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                Добавить пользователя
+            </div>
+            <div class="card-body">
+                {{ wtf.render_form(form) }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                Список работников
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>#</th>
+                        <th>Юзернейм</th>
+                        <th>ФИО</th>
+                        <th>Роль</th>
+                        {% if session.role == 2 %}
+                        <th>Действия</th>
+                        {% endif %}
+                    </tr>
+                    {% for u in us %}
+                    {% if u[6] != 0 %}
+                    <tr>
+                        <td>{{loop.index}}</td>
+                        <td>{{u[1]}}</td>
+                        <td>{{u[3]}}</td>
+                        <td>{{u[6]}}</td>
+                        {% if session.role == 2 %}
+                        <td>{% if u[1] != 'root' %}<a href="/users/rm/{{u[0]}}">
+                            <button class="btn btn-sm btn-primary">Удалить</button>
+                        </a>{% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

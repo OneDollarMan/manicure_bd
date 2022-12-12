@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% import 'bootstrap5/form.html' as wtf %}
+
+{% block app_content %}
+<div class="row">
+    {% if session.role == 2 %}
+    <div class="col col-sm-2">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                Добавить услугу
+            </div>
+            <div class="card-body">
+                {{ wtf.render_form(form) }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                Список услуг
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>#</th>
+                        <th>Название</th>
+                        <th>Цена</th>
+                        <th>Длительность</th>
+                        {% if session.role == 2 %}
+                        <th>Действия</th>
+                        {% endif %}
+                    </tr>
+                    {% for s in ss %}
+                    <tr>
+                        <td>{{loop.index}}</td>
+                        <td>{{s[1]}}</td>
+                        <td>{{s[2]}} р</td>
+                        <td>{{s[3]}}</td>
+                        {% if session.role == 2 %}
+                        <td><a href="/services/rm/{{s[0]}}">
+                            <button class="btn btn-primary btn-sm">Удалить</button>
+                        </a></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

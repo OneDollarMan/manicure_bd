@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% import 'bootstrap5/form.html' as wtf %}
+
+{% block app_content %}
+<a href="../orders">
+    <button class="btn btn-primary"> < Назад</button>
+</a>
+<br><br>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                Информация о заказе
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <td>Время</td>
+                        <td>{{o[1]}}</td>
+                    </tr>
+                    <tr>
+                        <td>Мастер</td>
+                        <td>{{o[11]}}</td>
+                    </tr>
+                    <tr>
+                        <td>Клиент</td>
+                        <td>{{o[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>Длительность</td>
+                        <td>{{o[15]}}</td>
+                    </tr>
+                    <tr>
+                        <td>Сумма</td>
+                        <td>{{o[16]}}</td>
+                    </tr>
+                    <tr>
+                        <td>Статус</td>
+                        <td>{{o[14]}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                Услуги
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>#</th>
+                        <th>Название</th>
+                        <th>Цена</th>
+                        <th>Длительность</th>
+                    </tr>
+                    {% for s in services %}
+                    <tr>
+                        <td>{{loop.index}}</td>
+                        <td>{{s[3]}}</td>
+                        <td>{{s[4]}} р</td>
+                        <td>{{s[5]}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if session.role == 2 %}
+    <div class="col col-sm-3">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                Изменить статус
+            </div>
+            <div class="card-body">
+                {{ wtf.render_form(form) }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
