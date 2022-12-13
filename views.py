@@ -90,6 +90,14 @@ def rm_service(id):
     return redirect(url_for("services"))
 
 
+@app.route("/services/hide/<int:id>")
+def hide_service(id):
+    if session.get('role') == repo.ROLE_ADMINISTRATOR:
+        if id:
+            repo.hide_service(id)
+    return redirect(url_for("services"))
+
+
 @app.route("/clients", methods=['GET', 'POST'])
 def clients():
     form = forms.ClientForm()

@@ -22,10 +22,11 @@ class Repo:
 
             self.get_roles = lambda: self.raw_query("SELECT * from role")
 
-            self.get_services = lambda: self.raw_query("SELECT * FROM service_type")
+            self.get_services = lambda: self.raw_query("SELECT * FROM service_type WHERE hidden='0'")
             self.add_service = lambda name, price, duration: self.write_query(f"INSERT INTO service_type SET name='{name}', price='{price}', duration='{duration}'")
             self.rm_service = lambda id: self.write_query(f"DELETE FROM service_type WHERE id='{id}'")
-            self.select_services = lambda: self.raw_query("SELECT id, name FROM service_type")
+            self.select_services = lambda: self.raw_query("SELECT id, name FROM service_type WHERE hidden='0'")
+            self.hide_service = lambda id: self.raw_query(f"UPDATE service_type SET hidden='1' WHERE id='{id}'")
 
             self.get_clients = lambda: self.raw_query("SELECT * FROM client")
             self.add_client = lambda name, number: self.write_query(f"INSERT INTO client SET first_name='{name}', number='{number}'")
