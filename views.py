@@ -68,7 +68,7 @@ def users():
 def rm_user(id):
     if session.get('role') == repo.ROLE_ADMINISTRATOR:
         if id:
-            repo.remove_user(id)
+            repo.hide_user_with_orders(id)
     return redirect(url_for('users'))
 
 

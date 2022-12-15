@@ -13,12 +13,13 @@ class Repo:
             self.select_db(db)
             self.get_tables = lambda: self.raw_query("SHOW TABLES")
 
-            self.get_user = lambda username: self.get_query(f"SELECT * FROM user WHERE username='{username}'")
-            self.get_all_users = lambda: self.raw_query("SELECT * FROM user JOIN role ON user.role_id=role.id")
-            self.login_user = lambda username, password: self.get_query(f"SELECT * FROM user WHERE username='{username}' AND password='{password}'")
+            self.get_user = lambda username: self.get_query(f"SELECT * FROM user WHERE username='{username}' AND hidden='0'")
+            self.get_all_users = lambda: self.raw_query("SELECT * FROM user JOIN role ON user.role_id=role.id WHERE hidden='0'")
+            self.login_user = lambda username, password: self.get_query(f"SELECT * FROM user WHERE username='{username}' AND password='{password}' AND hidden='0'")
             self.add_u = lambda username, password, fio, role_id: self.write_query(f"INSERT INTO user SET username='{username}', fio='{fio}', password='{password}', role_id='{role_id}'")
             self.rm_user = lambda id: self.write_query(f"DELETE FROM user WHERE id='{id}'")
-            self.select_users = lambda: self.raw_query("SELECT id, fio FROM user WHERE role_id='1'")
+            self.select_users = lambda: self.raw_query("SELECT id, fio FROM user WHERE role_id='1' AND hidden='0'")
+            self.hide_user = lambda id: self.write_query(f"UPDATE user SET hidden='1' WHERE id='{id}'")
 
             self.get_roles = lambda: self.raw_query("SELECT * from role")
 
@@ -154,3 +155,10 @@ class Repo:
         for o in orders:
             self.remove_order(o[0])
         self.rm_client(id)
+
+    def hide_user_with_orders(self, id):
+        orders = self.get_user_orders(id)
+        for o in orders:
+            if o[4] == 1:
+                self.remove_order(o[0])
+        self.hide_user(id)
