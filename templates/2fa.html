@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import 'bootstrap5/form.html' as wtf %}
+
+{% block app_content %}
+<div class="row justify-content-center">
+    <div class="col col-lg-5">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                Двухфакторная аутентификация
+            </div>
+            <div class="card-body">
+                <p>Двухфакторная аутентификация: <b>{% if enable %}Включена{% else %}Выключена{% endif %}</b><br>
+                    Ваш секретный ключ: <b>{{ secret }}</b> <br>
+                    Инструкция:
+                <ul>
+                    <li>Скачать Google Authenticator на свой телефон</li>
+                    <li>Создать новый аккаунт с помощью <b>ключа настройки.</b></li>
+                    <li>Ввести вручную необходимые данные (имя аккаунта любое, ключ).</li>
+                    <li>Выбрать аутентификацию по времени</li>
+                    <li>Нажать на "Добавить"</li>
+                </ul>
+                <div>Или отсканируйте QR код в приложении Google Authenticator
+                <div id="qrcode"></div>
+                <script src="qrcode.js"></script>
+                <script type="text/javascript">
+                    new QRCode(document.getElementById("qrcode"), "{{url}}");
+                </script>
+                <br>
+                <a href="/2fa/generate">
+                    <button class="btn btn-primary">Получить ключ (если нет)</button>
+                </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col col-sm-3">
+        <div class="card">
+            <div class="card-header text-bg-dark">
+                {% if enable %}Выключение{% else %}Включение{% endif %} двухфакторной авторизации
+            </div>
+            <div class="card-body">
+                {{ wtf.render_form(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

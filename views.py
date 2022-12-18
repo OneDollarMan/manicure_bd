@@ -1,6 +1,6 @@
 import hashlib
 from datetime import datetime
-
+import pyotp
 from flask import url_for, render_template, request, redirect, send_from_directory, flash, session
 from __init__ import app
 import forms
@@ -28,17 +28,59 @@ def login():
         return redirect(url_for('index'))
     form = forms.LoginForm()
     if form.validate_on_submit():
-        user = repo.login_user(form.login.data, hashlib.md5(form.password.data.encode('utf-8')).hexdigest())
+        user = repo.login_user_safe(form.login.data, hashlib.md5(form.password.data.encode('utf-8')).hexdigest())
         if user:
-            flash('Вы авторизовались!')
-            session['loggedin'] = True
-            session['id'] = user[0]
-            session['username'] = user[1]
-            session['role'] = user[4]
+            if user[6]:
+                if pyotp.TOTP(user[7]).verify(form.otp.data):
+                    flash('Вы авторизовались!')
+                    session['loggedin'] = True
+                    session['id'] = user[0]
+                    session['username'] = user[1]
+                    session['role'] = user[4]
+                else:
+                    flash('Неправильный OTP')
+            else:
+                flash('Вы авторизовались!')
+                session['loggedin'] = True
+                session['id'] = user[0]
+                session['username'] = user[1]
+                session['role'] = user[4]
             return redirect(url_for('index'))
         else:
             flash('Неверный логин или пароль!')
     return render_template('login.html', title='Авторизация', form=form)
+
+
+@app.route("/2fa", methods=['GET', 'POST'])
+def fa():
+    if session.get('loggedin'):
+        form = forms.FaForm()
+        user = repo.get_user(session.get('username'))
+
+        if form.validate_on_submit():
+            if pyotp.TOTP(user[7]).verify(form.otp.data):
+                if repo.toggle_2fa(user[0]):
+                    flash('Двойная аутентификация включена')
+                else:
+                    flash('Двойная аутентификация выключена')
+            else:
+                flash('Неправильный OTP')
+            return redirect(url_for('fa'))
+        return render_template("2fa.html", title='Двухфакторная аутентификация', enable=user[6], secret=user[7], form=form, url=pyotp.totp.TOTP(user[7]).provisioning_uri(name=session.get('username'), issuer_name='Маникюрный салон'))
+    else:
+        flash('Требуется аутентификация')
+        return redirect(url_for('index'))
+
+
+@app.route('/2fa/generate')
+def generate():
+    if session.get('loggedin'):
+        if repo.add_secret_key_to_user(session.get('username'), pyotp.random_base32()):
+            flash('Ключ сгенерирован')
+        else:
+            flash('Ключ уже имеется')
+        return redirect(url_for('fa'))
+    return redirect(url_for('index'))
 
 
 @app.route('/logout')
@@ -146,6 +188,7 @@ def orders_add():
             flash('Время занято')
     return redirect(url_for("orders"))
 
+
 @app.route("/orders/rm/<int:id>")
 def rm_order(id):
     if session.get('role') == repo.ROLE_ADMINISTRATOR:
@@ -179,6 +222,7 @@ def turnover():
 @app.route('/favicon.ico')
 @app.route('/style.css')
 @app.route('/script.js')
+@app.route('/qrcode.js')
 def static_from_root():
     return send_from_directory(app.static_folder, request.path[1:])
 

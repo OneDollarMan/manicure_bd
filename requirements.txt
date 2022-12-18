@@ -4,3 +4,4 @@ mysql-connector-python~=8.0.28
 PyYAML~=6.0
 Flask-wtf
 bootstrap-flask
+pyotp

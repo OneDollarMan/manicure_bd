@@ -20,7 +20,13 @@ def date_check(form, field):
 class LoginForm(FlaskForm):
     login = StringField('Логин', [rus_input_required, rus_length])
     password = PasswordField('Пароль', [rus_input_required, rus_length])
+    otp = StringField('OTP (опционально)', [Optional()])
     submit = SubmitField('Войти')
+
+
+class FaForm(FlaskForm):
+    otp = StringField('Введите OTP из приложения Google', [rus_input_required])
+    submit = SubmitField('Включить')
 
 
 class UserForm(FlaskForm):
