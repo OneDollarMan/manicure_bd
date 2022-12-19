@@ -96,6 +96,7 @@ def logout():
 def users():
     form = forms.UserForm()
     form.role.choices = repo.get_roles()
+    print(repo.get_all_users())
     if form.validate_on_submit():
         if session.get('role') == repo.ROLE_ADMINISTRATOR:
             if not repo.add_user(form.username.data, hashlib.md5(form.password.data.encode('utf-8')).hexdigest(), form.fio.data, form.role.data):
