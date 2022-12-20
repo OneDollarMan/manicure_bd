@@ -17,7 +17,7 @@ def flash_errors(form):
 
 @app.after_request
 def add_security_headers(resp):
-    resp.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' https://cdn.jsdelivr.net; script-src 'self' https://cdn.jsdelivr.net; font-src https://fonts.gstatic.com"
+    resp.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' https://cdn.jsdelivr.net; script-src 'self' https://cdn.jsdelivr.net; font-src https://fonts.gstatic.com; frame-ancestors 'self'; form-action 'self';"
     return resp
 
 
@@ -104,7 +104,6 @@ def logout():
 def users():
     form = forms.UserForm()
     form.role.choices = repo.get_roles()
-    print(repo.get_all_users())
     if form.validate_on_submit():
         if session.get('role') == repo.ROLE_ADMINISTRATOR:
             if not repo.add_user(form.username.data, hashlib.md5(form.password.data.encode('utf-8')).hexdigest(),
