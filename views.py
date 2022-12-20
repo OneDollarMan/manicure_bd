@@ -15,6 +15,12 @@ def flash_errors(form):
             flash(error)
 
 
+@app.after_request
+def add_security_headers(resp):
+    resp.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self' https://cdn.jsdelivr.net; script-src 'self' https://cdn.jsdelivr.net; font-src https://fonts.gstatic.com"
+    return resp
+
+
 @app.route("/")
 def index():
     if not session.get('loggedin'):
@@ -66,7 +72,9 @@ def fa():
             else:
                 flash('Неправильный OTP')
             return redirect(url_for('fa'))
-        return render_template("2fa.html", title='Двухфакторная аутентификация', enable=user[6], secret=user[7], form=form, url=pyotp.totp.TOTP(user[7]).provisioning_uri(name=session.get('username'), issuer_name='Маникюрный салон'))
+        return render_template("2fa.html", title='Двухфакторная аутентификация', enable=user[6], secret=user[7],
+                               form=form, url=pyotp.totp.TOTP(user[7]).provisioning_uri(name=session.get('username'),
+                                                                                        issuer_name='Маникюрный салон'))
     else:
         flash('Требуется аутентификация')
         return redirect(url_for('index'))
@@ -99,10 +107,12 @@ def users():
     print(repo.get_all_users())
     if form.validate_on_submit():
         if session.get('role') == repo.ROLE_ADMINISTRATOR:
-            if not repo.add_user(form.username.data, hashlib.md5(form.password.data.encode('utf-8')).hexdigest(), form.fio.data, form.role.data):
+            if not repo.add_user(form.username.data, hashlib.md5(form.password.data.encode('utf-8')).hexdigest(),
+                                 form.fio.data, form.role.data):
                 flash('Пользователь уже существует')
             else:
-                app.logger.warning(f'User {form.username.data} with role id {form.role.data} was added by {session.get("username")}')
+                app.logger.warning(
+                    f'User {form.username.data} with role id {form.role.data} was added by {session.get("username")}')
             return redirect(url_for('users'))
     return render_template('users.html', title='Пользователи', us=repo.get_all_users(), form=form)
 
@@ -173,7 +183,10 @@ def orders():
     filter_form.client.choices = [("", "---")] + repo.select_clients()
 
     if filter_form.validate_on_submit():
-        return render_template('orders.html', title="Заказы", orders=repo.get_orders_sorted(filter_form.user.data, filter_form.client.data, filter_form.date1.data, filter_form.date2.data), form=form, filter_form=filter_form)
+        return render_template('orders.html', title="Заказы",
+                               orders=repo.get_orders_sorted(filter_form.user.data, filter_form.client.data,
+                                                             filter_form.date1.data, filter_form.date2.data), form=form,
+                               filter_form=filter_form)
 
     return render_template('orders.html', title="Заказы", orders=repo.get_orders(), form=form, filter_form=filter_form)
 
@@ -205,7 +218,8 @@ def order(id):
     if form.validate_on_submit():
         repo.change_order_status(id, form.status.data)
     if session.get('role') >= repo.ROLE_MASTER:
-        return render_template('order.html', title='Заказ', o=repo.get_order(id)[0], services=repo.get_services_of_order(id), form=form)
+        return render_template('order.html', title='Заказ', o=repo.get_order(id)[0],
+                               services=repo.get_services_of_order(id), form=form)
 
 
 @app.route('/schedule')
@@ -224,6 +238,7 @@ def turnover():
 @app.route('/style.css')
 @app.route('/script.js')
 @app.route('/qrcode.js')
+@app.route('/graph.js')
 def static_from_root():
     return send_from_directory(app.static_folder, request.path[1:])
 
