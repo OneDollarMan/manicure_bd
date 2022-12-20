@@ -26,7 +26,7 @@ class LoginForm(FlaskForm):
 
 class FaForm(FlaskForm):
     otp = StringField('Введите OTP из приложения Google', [rus_input_required])
-    submit = SubmitField('Включить')
+    submit = SubmitField('Изменить')
 
 
 class UserForm(FlaskForm):

@@ -10,7 +10,7 @@
             </div>
             <div class="card-body">
                 <p>Двухфакторная аутентификация: <b>{% if enable %}Включена{% else %}Выключена{% endif %}</b><br>
-                    Ваш секретный ключ: <b>{{ secret }}</b> <br>
+                    {% if not enable %} Ваш секретный ключ: <b>{{ secret }}</b> <br>
                     Инструкция:
                 <ul>
                     <li>Скачать Google Authenticator на свой телефон</li>
@@ -30,6 +30,7 @@
                     <button class="btn btn-primary">Получить ключ (если нет)</button>
                 </a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
